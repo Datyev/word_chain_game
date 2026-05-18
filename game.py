@@ -45,9 +45,13 @@ def _display_message( status : PlayerStatus, name : str = None ) :
         print( '\n', 'GAME STOPPED ! ' )
 
 
-def read_player_names() :
+def print_intro_text() :
+          print('', 'Добро пожаловать в игру в слова!', 'В этой игре вам необходимо назвать слово, которое начинается на последнюю букву слова, произнесенного предыдущим игроком. Помните, что уже названные слова не могут быть использованы повторно. Каждый игрок имеет всего 3 попытки.', sep='\n\n')
+          print('\n','Введите список игроков через пробел (имена должны состоять только из букв). Не забудьте, что участников должно быть более одного. Удачи!', '\n\n')
+
+def read_and_handle_player_names() :
     global player_names, players_presence
-    player_names = [ name for name in input( 'player names ( only letters, min two players ) : ' ).split() \
+    player_names = [ name for name in input( 'player names : ' ).split() \
                      if name.isalpha() ]
     if len(player_names) <= 1 :
         players_presence = False
@@ -157,8 +161,8 @@ def display_game_results() :
 
 
 def run_game() :
-    read_player_names()
-    # display_player_names_errors()
+    print_intro_text()
+    read_and_handle_player_names()
     while not is_game_over() :
         display_prompt()
         read_player_input()
