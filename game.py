@@ -13,7 +13,7 @@ stopping_the_game = False
 players_presence = True
 player_status = None
 player = None
-word_lst = []
+words_used_lst = []
 repeat_word = False
 
 
@@ -45,9 +45,13 @@ def _display_message( status : PlayerStatus, name : str = None ) :
         print( '\n', 'GAME STOPPED ! ' )
 
 
-def read_player_names() :
+def print_intro_text() :
+          print('', 'Добро пожаловать в игру в слова!', 'В этой игре вам необходимо назвать слово, которое начинается на последнюю букву слова, произнесенного предыдущим игроком. Помните, что уже названные слова не могут быть использованы повторно. Каждый игрок имеет всего 3 попытки.', sep='\n\n')
+          print('\n','Введите список игроков через пробел (имена должны состоять только из букв). Не забудьте, что участников должно быть более одного. Удачи!', '\n\n')
+
+def read_and_handle_player_names() :
     global player_names, players_presence
-    player_names = [ name for name in input( 'player names ( only letters, min two players ) : ' ).split() \
+    player_names = [ name for name in input( 'player names : ' ).split() \
                      if name.isalpha() ]
     if len(player_names) <= 1 :
         players_presence = False
@@ -100,9 +104,10 @@ def display_move_message() :
 ########################################################################################################
 
 def _is_word_correct( word ) -> bool :
-    global word_lst, repeat_word
+    global words_used_lst, repeat_word
+
     if word.isalpha() and last_word :
-        if word not in word_lst :
+        if word not in words_used_lst :
             return word[ 0 ] == last_word[ -1 ]
         repeat_word = True
         return False
@@ -111,29 +116,28 @@ def _is_word_correct( word ) -> bool :
 
 def handle_player_input() :
     global current_player_index, last_move_is_successful, current_move_attempts, player_names, \
-        stopping_the_game, player_status, player, word_lst
+        stopping_the_game, player_status, player, words_used_lst
 
     if word == '.' :
         stopping_the_game = True
     elif word == '-' :
         last_move_is_successful = False
-        # name = player_names[ current_player_index ]
         player = player_names[ current_player_index ]
         player_status = PlayerStatus.LEFT_GAME
         _delete_player()
         return
+
     if _is_word_correct( word ) :
         # go to next player
         current_player_index = _get_next_index( current_player_index, player_names )
         last_move_is_successful = True
         current_move_attempts = 0
-        word_lst.append( word )
+        words_used_lst.append( word )
     else :
         last_move_is_successful = False
         if current_move_attempts < attempt_limit -1 :
             current_move_attempts += 1
         else :
-            # name = player_names[ current_player_index ]
             player_status = PlayerStatus.LOST
             player = player_names[ current_player_index ]
             _delete_player()
@@ -157,8 +161,8 @@ def display_game_results() :
 
 
 def run_game() :
-    read_player_names()
-    # display_player_names_errors()
+    print_intro_text()
+    read_and_handle_player_names()
     while not is_game_over() :
         display_prompt()
         read_player_input()
